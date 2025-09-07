@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # API Service
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://aomass:aomass@postgres:5432/aomass
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=aomass
+      - MINIO_SECRET_KEY=aomass123
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+      - minio
+    volumes:
+      - ./configs:/app/configs
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  # Worker Service
+  worker:
+    build: .
+    command: celery -A aomass.core.worker worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://aomass:aomass@postgres:5432/aomass
+      - REDIS_URL=redis://redis:6379/0
+      - QDRANT_URL=http://qdrant:6333
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=aomass
+      - MINIO_SECRET_KEY=aomass123
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+      - minio
+    volumes:
+      - ./configs:/app/configs
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=aomass
+      - POSTGRES_PASSWORD=aomass
+      - POSTGRES_DB=aomass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ACCESS_KEY=aomass
+      - MINIO_SECRET_KEY=aomass123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  # Flower (Celery monitoring)
+  flower:
+    build: .
+    command: celery -A aomass.core.worker flower
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+  minio_data:
+
+networks:
+  default:
+    driver: bridge

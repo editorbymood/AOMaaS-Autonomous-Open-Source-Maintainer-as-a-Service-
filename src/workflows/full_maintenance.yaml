@@ -1,0 +1,144 @@
+"""Warp workflow for full repository maintenance."""
+
+# Full Maintenance Workflow
+name: full-maintenance
+description: Complete repository maintenance workflow
+
+# Workflow inputs
+inputs:
+  repository_url:
+    type: string
+    description: GitHub repository URL
+    required: true
+  
+  branch:
+    type: string 
+    description: Target branch
+    default: main
+    
+  opportunity_types:
+    type: array
+    description: Types of opportunities to mine
+    default: []
+    
+  max_opportunities:
+    type: integer
+    description: Maximum opportunities to process
+    default: 5
+    
+  auto_create_prs:
+    type: boolean
+    description: Automatically create pull requests
+    default: true
+
+# Workflow steps
+steps:
+  - name: index-repository
+    description: Index the repository for analysis
+    action: aomass.indexer.index
+    inputs:
+      url: ${{ inputs.repository_url }}
+      branch: ${{ inputs.branch }}
+      force_reindex: false
+    outputs:
+      repository_id: repository_id
+      task_id: task_id
+  
+  - name: wait-for-indexing
+    description: Wait for indexing to complete
+    action: aomass.core.wait_for_task
+    inputs:
+      task_id: ${{ steps.index-repository.outputs.task_id }}
+      timeout: 300  # 5 minutes
+  
+  - name: mine-opportunities
+    description: Mine maintenance opportunities
+    action: aomass.miner.mine
+    depends_on: [wait-for-indexing]
+    inputs:
+      repository_id: ${{ steps.index-repository.outputs.repository_id }}
+      opportunity_types: ${{ inputs.opportunity_types }}
+      max_opportunities: ${{ inputs.max_opportunities }}
+    outputs:
+      opportunities: opportunities
+  
+  - name: process-opportunities
+    description: Process each opportunity
+    action: aomass.core.for_each
+    depends_on: [mine-opportunities]
+    for_each: ${{ steps.mine-opportunities.outputs.opportunities }}
+    steps:
+      - name: generate-plan
+        description: Generate implementation plan
+        action: aomass.planner.generate
+        inputs:
+          opportunity_id: ${{ item.id }}
+        outputs:
+          plan: plan
+      
+      - name: implement-plan
+        description: Implement the plan
+        action: aomass.implementer.implement
+        depends_on: [generate-plan]
+        inputs:
+          plan_id: ${{ steps.generate-plan.outputs.plan.id }}
+          dry_run: false
+        outputs:
+          implementation: implementation
+      
+      - name: create-pull-request
+        description: Create GitHub PR
+        action: aomass.pr_manager.create
+        depends_on: [implement-plan]
+        condition: ${{ inputs.auto_create_prs }}
+        inputs:
+          implementation_id: ${{ steps.implement-plan.outputs.implementation.id }}
+          draft: true
+        outputs:
+          pr: pr
+      
+      - name: review-pull-request
+        description: AI review of PR
+        action: aomass.reviewer.review
+        depends_on: [create-pull-request]
+        condition: ${{ inputs.auto_create_prs }}
+        inputs:
+          pull_request_id: ${{ steps.create-pull-request.outputs.pr.id }}
+          reviewers: ["security-agent", "performance-agent", "style-agent"]
+        outputs:
+          review: review
+
+# Workflow outputs
+outputs:
+  repository_id:
+    description: ID of the indexed repository
+    value: ${{ steps.index-repository.outputs.repository_id }}
+  
+  opportunities_count:
+    description: Number of opportunities processed
+    value: ${{ len(steps.mine-opportunities.outputs.opportunities) }}
+  
+  pull_requests:
+    description: Created pull requests
+    value: ${{ steps.process-opportunities.outputs[*].create-pull-request.pr }}
+
+# Error handling
+on_error:
+  - name: cleanup
+    description: Cleanup resources on failure
+    action: aomass.core.cleanup
+    inputs:
+      repository_id: ${{ steps.index-repository.outputs.repository_id }}
+
+# Notifications
+notifications:
+  on_success:
+    - type: webhook
+      url: ${{ env.WEBHOOK_URL }}
+      message: "Maintenance workflow completed for ${{ inputs.repository_url }}"
+  
+  on_failure:
+    - type: email
+      to: ${{ env.ADMIN_EMAIL }}
+      subject: "Maintenance workflow failed"
+      body: "Workflow failed for repository ${{ inputs.repository_url }}"

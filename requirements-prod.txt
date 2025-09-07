@@ -1,0 +1,57 @@
+# Production Dependencies for AOMaaS
+# Minimal set for production deployment
+
+# Web Framework & API
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+starlette==0.47.3
+
+# Data Validation
+pydantic==2.11.7
+pydantic-settings==2.6.1
+
+# Async & HTTP
+httpx==0.28.1
+aiofiles==24.1.0
+
+# Database
+sqlalchemy==2.0.35
+asyncpg==0.29.0
+
+# Cache & Queue
+redis==6.4.0
+celery==5.5.3
+
+# Vector Database
+qdrant-client==1.12.1
+
+# Object Storage  
+minio==7.2.10
+
+# GitHub Integration
+pygithub==2.5.0
+
+# AI Services (Optional - add API keys)
+openai==1.56.2
+anthropic==0.40.0
+
+# Configuration
+python-dotenv==1.1.1
+pyyaml==6.0.2
+
+# Logging
+structlog==24.4.0
+
+# Security
+cryptography==44.0.0
+
+# Utilities
+requests==2.32.5
+python-dateutil==2.9.0
+
+# Monitoring
+prometheus-client==0.21.1
+psutil==6.1.0
+
+# Performance
+orjson==3.11.1

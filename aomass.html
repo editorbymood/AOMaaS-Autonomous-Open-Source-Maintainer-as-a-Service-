@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>AOMaaS - Autonomous Open-Source Maintainer</title>
+    <link rel=\"stylesheet\" href=\"static/css/style.css\">
+    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\" rel=\"stylesheet\">
+    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">
+</head>
+<body>
+    <div class=\"container\">
+        <!-- Navigation -->
+        <nav class=\"navbar\">
+            <div class=\"nav-brand\">
+                <i class=\"fas fa-robot\"></i>
+                <span>AOMaaS</span>
+            </div>
+            <div class=\"nav-links\">
+                <a href=\"/\" class=\"nav-link\">Home</a>
+                <a href=\"/demo\" class=\"nav-link\">Demo</a>
+                <a href=\"/docs\" class=\"nav-link\">API Docs</a>
+                <a href=\"/health\" class=\"nav-link\">Status</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class=\"hero-section\">
+            <div class=\"hero-content\">
+                <div class=\"hero-badge\">
+                    <i class=\"fas fa-magic\"></i>
+                    <span>AI-Powered Repository Maintenance</span>
+                </div>
+                <h1 class=\"hero-title\">
+                    Autonomous Open-Source<br>
+                    <span class=\"gradient-text\">Maintainer as a Service</span>
+                </h1>
+                <p class=\"hero-description\">
+                    Revolutionize your codebase with AI-driven maintenance. Automatically detect issues, 
+                    plan fixes, implement changes, and create pull requests - all powered by advanced AI.
+                </p>
+                <div class=\"hero-buttons\">
+                    <button class=\"btn btn-primary\" onclick=\"startDemo()\">
+                        <i class=\"fas fa-play\"></i>
+                        Try Demo
+                    </button>
+                    <a href=\"/docs\" class=\"btn btn-secondary\">
+                        <i class=\"fas fa-book\"></i>
+                        API Documentation
+                    </a>
+                </div>
+            </div>
+            <div class=\"hero-visual\">
+                <div class=\"code-window\">
+                    <div class=\"window-header\">
+                        <div class=\"window-controls\">
+                            <span class=\"control red\"></span>
+                            <span class=\"control yellow\"></span>
+                            <span class=\"control green\"></span>
+                        </div>
+                        <span class=\"window-title\">aomass-maintenance.py</span>
+                    </div>
+                    <div class=\"code-content\">
+                        <div class=\"code-line\"><span class=\"comment\"># AOMaaS automatically detected issues</span></div>
+                        <div class=\"code-line\"><span class=\"keyword\">import</span> <span class=\"string\">security_fixes</span></div>
+                        <div class=\"code-line\"><span class=\"keyword\">import</span> <span class=\"string\">dependency_updates</span></div>
+                        <div class=\"code-line\"></div>
+                        <div class=\"code-line\"><span class=\"function\">fix_vulnerabilities</span>()</div>
+                        <div class=\"code-line\"><span class=\"function\">update_dependencies</span>()</div>
+                        <div class=\"code-line\"><span class=\"function\">optimize_performance</span>()</div>
+                        <div class=\"code-line\"></div>
+                        <div class=\"code-line\"><span class=\"comment\"># ✅ 12 issues resolved automatically</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class=\"features-section\">
+            <div class=\"section-header\">
+                <h2 class=\"section-title\">Powerful AI Features</h2>
+                <p class=\"section-subtitle\">Everything you need for autonomous repository maintenance</p>
+            </div>
+            <div class=\"features-grid\">
+                <div class=\"feature-card\">
+                    <div class=\"feature-icon\">
+                        <i class=\"fas fa-search\"></i>
+                    </div>
+                    <h3 class=\"feature-title\">Smart Repository Analysis</h3>
+                    <p class=\"feature-description\">
+                        Multi-language semantic analysis with Tree-sitter parsers for deep code understanding.
+                    </p>
+                </div>
+                <div class=\"feature-card\">
+                    <div class=\"feature-icon\">
+                        <i class=\"fas fa-bolt\"></i>
+                    </div>
+                    <h3 class=\"feature-title\">Opportunity Mining</h3>
+                    <p class=\"feature-description\">
+                        AI-powered detection of maintenance opportunities with priority scoring and confidence metrics.
+                    </p>
+                </div>
+                <div class=\"feature-card\">
+                    <div class=\"feature-icon\">
+                        <i class=\"fas fa-brain\"></i>
+                    </div>
+                    <h3 class=\"feature-title\">Implementation Planning</h3>
+                    <p class=\"feature-description\">
+                        Generate detailed step-by-step plans for implementing changes with risk assessment.
+                    </p>
+                </div>
+                <div class=\"feature-card\">
+                    <div class=\"feature-icon\">
+                        <i class=\"fas fa-code\"></i>
+                    </div>
+                    <h3 class=\"feature-title\">Automated Implementation</h3>
+                    <p class=\"feature-description\">
+                        Execute code changes automatically with comprehensive testing and validation.
+                    </p>
+                </div>
+                <div class=\"feature-card\">
+                    <div class=\"feature-icon\">
+                        <i class=\"fab fa-github\"></i>
+                    </div>
+                    <h3 class=\"feature-title\">GitHub Integration</h3>
+                    <p class=\"feature-description\">
+                        Seamless PR creation and management with automated summaries and reviews.
+                    </p>
+                </div>
+                <div class=\"feature-card\">
+                    <div class=\"feature-icon\">
+                        <i class=\"fas fa-users\"></i>
+                    </div>
+                    <h3 class=\"feature-title\">Multi-Agent Review</h3>
+                    <p class=\"feature-description\">
+                        5 specialized AI agents review changes for security, performance, and style.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class=\"stats-section\">
+            <div class=\"stats-grid\">
+                <div class=\"stat-card\">
+                    <div class=\"stat-number\">6+</div>
+                    <div class=\"stat-label\">Supported Languages</div>
+                </div>
+                <div class=\"stat-card\">
+                    <div class=\"stat-number\">6</div>
+                    <div class=\"stat-label\">Maintenance Types</div>
+                </div>
+                <div class=\"stat-card\">
+                    <div class=\"stat-number\">5</div>
+                    <div class=\"stat-label\">AI Review Agents</div>
+                </div>
+                <div class=\"stat-card\">
+                    <div class=\"stat-number\">99%</div>
+                    <div class=\"stat-label\">Uptime</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <div class=\"demo-section\" id=\"demo-section\">
+            <div class=\"section-header\">
+                <h2 class=\"section-title\">Try AOMaaS Live</h2>
+                <p class=\"section-subtitle\">Experience autonomous repository maintenance in action</p>
+            </div>
+            
+            <div class=\"demo-container\">
+                <div class=\"demo-input\">
+                    <h3>Repository Analysis</h3>
+                    <div class=\"input-group\">
+                        <input type=\"url\" id=\"repo-url\" placeholder=\"https://github.com/owner/repo\" class=\"demo-input-field\">
+                        <button onclick="analyzeRepository()" class=\"btn btn-primary\">
+                            <i class=\"fas fa-search\"></i>
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+                
+                <div class=\"demo-results\" id=\"demo-results\" style=\"display: none;\">
+                    <h3>Maintenance Opportunities</h3>
+                    <div id=\"opportunities-list\"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class=\"footer\">
+            <div class=\"footer-content\">
+                <div class=\"footer-brand\">
+                    <i class=\"fas fa-robot\"></i>
+                    <span>AOMaaS</span>
+                </div>
+                <div class=\"footer-links\">
+                    <a href=\"/docs\">API Docs</a>
+                    <a href=\"/health\">Status</a>
+                    <a href=\"https://github.com/aomass/aomass\">GitHub</a>
+                </div>
+                <div class=\"footer-text\">
+                    <p>&copy; 2024 AOMaaS. Autonomous Repository Maintenance.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src=\"/static/js/main.js\"></script>
+</body>
+</html>
