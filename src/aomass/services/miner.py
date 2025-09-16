@@ -3,7 +3,7 @@ import asyncio
 from typing import List
 from uuid import UUID, uuid4
 
-from aomass.models.core import Language, Opportunity, OpportunityType
+from ..models.core import Language, Opportunity, OpportunityType
 
 
 class MinerService:

@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AOMaaS - Autonomous Open-Source Maintainer</title>
+    <title>AOMaaS - AI-Powered Repository Maintenance</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
 </head>
 <body>
     <div class="container">
         <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-brand">
-                <i class="fas fa-robot"></i>
-                <span>AOMaaS</span>
+                <img src="/static/images/logo.svg" alt="AOMaaS Logo" height="40">
             </div>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
                 <a href="/demo" class="nav-link">Demo</a>
                 <a href="/docs" class="nav-link">API Docs</a>
                 <a href="/health" class="nav-link">Status</a>
+                <a href="#" class="btn btn-primary">Sign Up</a>
             </div>
         </nav>
 
@@ -178,6 +180,11 @@
                             Analyze
                         </button>
                     </div>
+                </div>
+                
+                <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing repository...</p>
                 </div>
                 
                 <div class="demo-results" id="demo-results" style="display: none;">

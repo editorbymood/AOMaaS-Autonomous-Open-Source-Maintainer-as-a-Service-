@@ -3,7 +3,7 @@ import asyncio
 from typing import Any, Dict, List
 from uuid import UUID, uuid4
 
-from aomass.models.core import Implementation, Plan, TaskStatus
+from ..models.core import Implementation, Plan, TaskStatus
 
 
 class ImplementerService:

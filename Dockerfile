@@ -13,9 +13,11 @@ COPY requirements.txt ./
 # Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
-# Copy source code
+# Copy source code and assets
 COPY src/ ./src/
 COPY configs/ ./configs/
+COPY static/ ./static/
+COPY templates/ ./templates/
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash aomass

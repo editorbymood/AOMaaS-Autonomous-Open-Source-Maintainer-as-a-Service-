@@ -1,10 +1,12 @@
 """Core data models for AOMaaS."""
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
+
+from .providers import ProviderType
 
 
 class TaskStatus(str, Enum):
@@ -45,6 +47,9 @@ class Repository(BaseModel):
     url: str
     default_branch: str = "main"
     languages: List[Language] = Field(default_factory=list)
+    provider_type: str = ProviderType.GITHUB.value
+    provider_id: str = "github"
+    provider_specific_data: Dict[str, Any] = Field(default_factory=dict)
     indexed_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -103,13 +108,35 @@ class PullRequest(BaseModel):
     """Pull request model."""
     id: UUID = Field(default_factory=uuid4)
     implementation_id: UUID
-    github_pr_number: Optional[int] = None
+    repository_id: UUID
+    provider_type: str = ProviderType.GITHUB.value
+    provider_id: str = "github"
+    provider_pr_id: str
+    number: Optional[int] = None
     title: str
     description: str
     branch_name: str
-    status: str = "draft"  # draft, open, merged, closed
+    status: str
+    url: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    merged_at: Optional[datetime] = None
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class Review(BaseModel):
+    """Code review model."""
+    id: UUID = Field(default_factory=uuid4)
+    pull_request_id: UUID
+    reviewer_id: str
+    status: str
+    comments: List[Dict[str, Any]] = Field(default_factory=list)
+    provider_type: str = ProviderType.GITHUB.value
+    provider_id: str = "github"
+    provider_review_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+# Old PullRequest model replaced by the new one above
 
 
 class Review(BaseModel):

@@ -15,8 +15,9 @@ AOMaaS is an AI-powered service that automatically maintains open-source codebas
 - **Opportunity Mining**: Automated detection of maintenance needs
 - **Change Planning**: Structured migration and update specifications  
 - **Code Implementation**: AI-powered code changes with style consistency
-- **PR Management**: Automated GitHub integration with review workflows
+- **PR Management**: Multi-cloud provider integration with GitHub, GitLab, and more
 - **Multi-Agent Review**: Comprehensive code review before deployment
+- **Multi-Cloud Provider**: Support for GitHub, GitLab, and other Git providers
 
 ### Supported Languages
 - Python, JavaScript/TypeScript, Rust, Go, Java
@@ -32,11 +33,11 @@ AOMaaS is an AI-powered service that automatically maintains open-source codebas
 
 ## 📋 API Endpoints
 
--  - Index a GitHub repository
+-  - Index a repository from any supported cloud provider
 -  - Mine maintenance opportunities  
 -  - Generate change implementation plans
 -  - Execute planned code changes
--  - Create GitHub pull requests
+-  - Create pull requests on GitHub, GitLab, and other supported providers
 -  - Multi-agent code review
 
 ## 🛠 Quick Start
@@ -66,7 +67,15 @@ AOMaaS is an AI-powered service that automatically maintains open-source codebas
 
 ## 🏗 Architecture
 
+AOMaaS follows a modular architecture with these key components:
 
+- **API Layer**: FastAPI-based REST endpoints
+- **Service Layer**: Core business logic implementation
+- **Provider Layer**: Multi-cloud provider abstraction (GitHub, GitLab, etc.)
+- **Model Layer**: Data models and schemas
+- **Infrastructure**: Vector DB, object storage, and task queues
+
+For more details, see the [MCP Architecture Documentation](docs/mcp_architecture.md).
 
 ## 📁 Project Structure
 

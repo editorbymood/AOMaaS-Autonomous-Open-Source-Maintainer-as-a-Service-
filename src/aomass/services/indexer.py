@@ -2,17 +2,18 @@
 import asyncio
 import hashlib
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple, Union
 from uuid import UUID, uuid4
 
 import aiofiles
 import tree_sitter
-from git import Repo
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 
-from aomass.config.settings import settings
-from aomass.models.core import CodeFile, Language, Repository
+from ..config.settings import settings
+from ..models.core import CodeFile, Language, Repository
+from ..models.providers import ProviderType, RepositoryReference
+from ..providers.factory import ProviderFactory
 
 
 class IndexerService:
@@ -22,15 +23,33 @@ class IndexerService:
         self.qdrant_client = QdrantClient(url=settings.qdrant_url)
         self.temp_dir = Path("/tmp/aomass_repos")
         self.temp_dir.mkdir(exist_ok=True)
+        self.provider_factory = ProviderFactory
     
     async def index_repository(
         self, 
         url: str, 
-        branch: str = "main", 
+        provider_type: str = None,
+        branch: str = None, 
         force_reindex: bool = False
     ) -> str:
-        """Index a GitHub repository."""
-        repo_info = self._parse_github_url(url)
+        """Index a repository from any supported cloud provider."""
+        # Determine provider type from URL if not specified
+        if not provider_type:
+            provider_type, repo_info = self._detect_provider_from_url(url)
+        else:
+            provider_type = ProviderType(provider_type)
+            repo_info = self._parse_repository_url(url, provider_type)
+        
+        # Get provider instance
+        provider = self.provider_factory.get_provider(provider_type)
+        if not provider:
+            raise ValueError(f"Unsupported provider type: {provider_type}")
+        
+        # Get repository reference
+        repo_ref = await provider.get_repository(repo_info["owner"], repo_info["repo"])
+        if not repo_ref:
+            raise ValueError(f"Repository not found: {url}")
+        
         repository_id = uuid4()
         
         # Create task ID for tracking
@@ -38,7 +57,7 @@ class IndexerService:
         
         # Start background indexing
         asyncio.create_task(self._index_repository_background(
-            repository_id, url, repo_info, branch, force_reindex, task_id
+            repository_id, repo_ref, branch, force_reindex, task_id
         ))
         
         return task_id
@@ -46,33 +65,43 @@ class IndexerService:
     async def _index_repository_background(
         self,
         repository_id: UUID,
-        url: str,
-        repo_info: dict,
-        branch: str,
-        force_reindex: bool,
-        task_id: str
+        repo_ref: RepositoryReference,
+        branch: str = None,
+        force_reindex: bool = False,
+        task_id: str = None
     ):
         """Background repository indexing."""
         try:
+            # Get provider
+            provider = self.provider_factory.get_provider(repo_ref.provider_type)
+            if not provider:
+                raise ValueError(f"Provider not available: {repo_ref.provider_type}")
+            
             # Clone repository
-            repo_path = await self._clone_repository(url, branch)
+            repo_path = await provider.clone_repository(
+                repo_ref, 
+                str(self.temp_dir / str(repository_id)),
+                branch=branch or repo_ref.default_branch
+            )
             
             # Analyze repository structure
-            languages = await self._detect_languages(repo_path)
+            languages = await self._detect_languages(Path(repo_path))
             
             # Create repository record
             repository = Repository(
                 id=repository_id,
-                owner=repo_info["owner"],
-                name=repo_info["repo"],
-                full_name=f"{repo_info['owner']}/{repo_info['repo']}",
-                url=url,
-                default_branch=branch,
-                languages=languages
+                owner=repo_ref.full_name.split('/')[0],
+                name=repo_ref.full_name.split('/')[1],
+                full_name=repo_ref.full_name,
+                url=repo_ref.url,
+                default_branch=branch or repo_ref.default_branch,
+                languages=languages,
+                provider_type=repo_ref.provider_type.value,
+                provider_id=repo_ref.provider_id
             )
             
             # Index code files
-            await self._index_code_files(repository, repo_path)
+            await self._index_code_files(repository, Path(repo_path))
             
             # Create vector collection in Qdrant
             await self._create_vector_collection(repository_id)
@@ -84,20 +113,42 @@ class IndexerService:
         finally:
             # Cleanup
             if 'repo_path' in locals():
-                await self._cleanup_repository(repo_path)
+                await self._cleanup_repository(Path(repo_path))
     
-    async def _clone_repository(self, url: str, branch: str) -> Path:
-        """Clone repository to temporary directory."""
-        repo_id = hashlib.md5(url.encode()).hexdigest()
-        repo_path = self.temp_dir / repo_id
+    def _detect_provider_from_url(self, url: str) -> Tuple[ProviderType, Dict[str, str]]:
+        """Detect provider type from URL and parse repository info."""
+        if "github.com" in url:
+            return ProviderType.GITHUB, self._parse_repository_url(url, ProviderType.GITHUB)
+        elif "gitlab.com" in url or settings.gitlab_url in url:
+            return ProviderType.GITLAB, self._parse_repository_url(url, ProviderType.GITLAB)
+        elif "bitbucket.org" in url:
+            return ProviderType.BITBUCKET, self._parse_repository_url(url, ProviderType.BITBUCKET)
+        elif "dev.azure.com" in url:
+            return ProviderType.AZURE_DEVOPS, self._parse_repository_url(url, ProviderType.AZURE_DEVOPS)
+        elif "codecommit" in url:
+            return ProviderType.AWS_CODECOMMIT, self._parse_repository_url(url, ProviderType.AWS_CODECOMMIT)
+        else:
+            return ProviderType.GENERIC_GIT, {"url": url, "owner": "unknown", "repo": "unknown"}
+    
+    def _parse_repository_url(self, url: str, provider_type: ProviderType) -> Dict[str, str]:
+        """Parse repository URL based on provider type."""
+        if provider_type == ProviderType.GITHUB:
+            return self._parse_github_url(url)
+        elif provider_type == ProviderType.GITLAB:
+            # TODO: Implement GitLab URL parsing
+            pass
+        elif provider_type == ProviderType.BITBUCKET:
+            # TODO: Implement Bitbucket URL parsing
+            pass
+        elif provider_type == ProviderType.AZURE_DEVOPS:
+            # TODO: Implement Azure DevOps URL parsing
+            pass
+        elif provider_type == ProviderType.AWS_CODECOMMIT:
+            # TODO: Implement AWS CodeCommit URL parsing
+            pass
         
-        if repo_path.exists():
-            # Remove existing clone
-            import shutil
-            shutil.rmtree(repo_path)
-        
-        # Clone repository
-        Repo.clone_from(url, repo_path, branch=branch, depth=1)
+        # Default fallback
+        return {"url": url, "owner": "unknown", "repo": "unknown"}
         return repo_path
     
     async def _detect_languages(self, repo_path: Path) -> List[Language]:

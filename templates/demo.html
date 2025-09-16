@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOMaaS - Demo</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="/static/js/demo.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="/">AOMaaS</a>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/demo" class="active">Demo</a></li>
+                    <li><a href="/docs">API Docs</a></li>
+                    <li><a href="/login" class="btn btn-primary">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="demo-hero">
+            <div class="container">
+                <h1>Try AOMaaS Demo</h1>
+                <p>Experience the power of Autonomous Open-Source Maintenance without connecting your own repositories.</p>
+            </div>
+        </section>
+
+        <section class="demo-content">
+            <div class="container">
+                <div class="demo-tabs">
+                    <button class="tab-btn active" data-tab="repositories">Repositories</button>
+                    <button class="tab-btn" data-tab="opportunities">Opportunities</button>
+                    <button class="tab-btn" data-tab="implementations">Implementations</button>
+                </div>
+
+                <div class="tab-content active" id="repositories">
+                    <h2>Demo Repositories</h2>
+                    <p>Select a repository to explore maintenance opportunities:</p>
+                    
+                    <div class="repo-cards">
+                        <div class="repo-card" data-repo-id="demo-repo-1">
+                            <div class="repo-header">
+                                <h3>sample-python-app</h3>
+                                <div class="repo-stats">
+                                    <span><i class="fas fa-star"></i> 120</span>
+                                    <span><i class="fas fa-code-branch"></i> 35</span>
+                                </div>
+                            </div>
+                            <p>A sample Python application with various improvement opportunities</p>
+                            <div class="repo-footer">
+                                <span class="language"><span class="lang-color python"></span> Python</span>
+                                <button class="btn btn-sm btn-outline">View Opportunities</button>
+                            </div>
+                        </div>
+
+                        <div class="repo-card" data-repo-id="demo-repo-2">
+                            <div class="repo-header">
+                                <h3>react-dashboard</h3>
+                                <div class="repo-stats">
+                                    <span><i class="fas fa-star"></i> 450</span>
+                                    <span><i class="fas fa-code-branch"></i> 120</span>
+                                </div>
+                            </div>
+                            <p>A React dashboard with performance optimization opportunities</p>
+                            <div class="repo-footer">
+                                <span class="language"><span class="lang-color javascript"></span> JavaScript</span>
+                                <button class="btn btn-sm btn-outline">View Opportunities</button>
+                            </div>
+                        </div>
+
+                        <div class="repo-card" data-repo-id="demo-repo-3">
+                            <div class="repo-header">
+                                <h3>go-microservice</h3>
+                                <div class="repo-stats">
+                                    <span><i class="fas fa-star"></i> 320</span>
+                                    <span><i class="fas fa-code-branch"></i> 85</span>
+                                </div>
+                            </div>
+                            <p>A Go microservice with scalability improvements</p>
+                            <div class="repo-footer">
+                                <span class="language"><span class="lang-color go"></span> Go</span>
+                                <button class="btn btn-sm btn-outline">View Opportunities</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="opportunities">
+                    <h2>Maintenance Opportunities</h2>
+                    <p>These are automatically detected improvement opportunities:</p>
+                    
+                    <div class="opportunity-list">
+                        <div class="opportunity-item" data-opp-id="demo-opp-1">
+                            <div class="opportunity-header">
+                                <span class="priority high">High</span>
+                                <h3>Optimize database query performance</h3>
+                            </div>
+                            <p>The current query is fetching all records without pagination, causing performance issues with large datasets.</p>
+                            <div class="opportunity-meta">
+                                <span><i class="fas fa-file-code"></i> app/models/user.py:45</span>
+                                <span><i class="fas fa-tag"></i> Performance</span>
+                                <span><i class="fas fa-clock"></i> Medium effort</span>
+                            </div>
+                            <div class="opportunity-actions">
+                                <button class="btn btn-sm btn-primary">View Implementation</button>
+                            </div>
+                        </div>
+
+                        <div class="opportunity-item" data-opp-id="demo-opp-2">
+                            <div class="opportunity-header">
+                                <span class="priority medium">Medium</span>
+                                <h3>Add proper error handling</h3>
+                            </div>
+                            <p>The function lacks proper error handling, which can lead to unexpected crashes.</p>
+                            <div class="opportunity-meta">
+                                <span><i class="fas fa-file-code"></i> app/services/api.py:78</span>
+                                <span><i class="fas fa-tag"></i> Reliability</span>
+                                <span><i class="fas fa-clock"></i> Low effort</span>
+                            </div>
+                            <div class="opportunity-actions">
+                                <button class="btn btn-sm btn-primary">View Implementation</button>
+                            </div>
+                        </div>
+
+                        <div class="opportunity-item" data-opp-id="demo-opp-3">
+                            <div class="opportunity-header">
+                                <span class="priority high">High</span>
+                                <h3>Fix security vulnerability in authentication</h3>
+                            </div>
+                            <p>The current implementation is vulnerable to timing attacks.</p>
+                            <div class="opportunity-meta">
+                                <span><i class="fas fa-file-code"></i> app/auth/login.py:112</span>
+                                <span><i class="fas fa-tag"></i> Security</span>
+                                <span><i class="fas fa-clock"></i> High effort</span>
+                            </div>
+                            <div class="opportunity-actions">
+                                <button class="btn btn-sm btn-outline">Generate Implementation</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="implementations">
+                    <h2>Implementations</h2>
+                    <p>View AI-generated implementations for the detected opportunities:</p>
+                    
+                    <div class="implementation-list">
+                        <div class="implementation-item" data-impl-id="demo-impl-1">
+                            <div class="implementation-header">
+                                <span class="status completed">Completed</span>
+                                <h3>Implemented pagination for database queries</h3>
+                            </div>
+                            <p>Added pagination to the database query to improve performance with large datasets.</p>
+                            <div class="code-diff">
+                                <pre><code>@@ -45,7 +45,10 @@
+ def get_all_users():
+-    return db.session.query(User).all()
++    page = request.args.get('page', 1, type=int)
++    per_page = request.args.get('per_page', 20, type=int)
++    pagination = db.session.query(User).paginate(page=page, per_page=per_page)
++    return pagination.items, pagination.total</code></pre>
+                            </div>
+                            <div class="implementation-actions">
+                                <button class="btn btn-sm btn-primary">Create PR</button>
+                            </div>
+                        </div>
+
+                        <div class="implementation-item" data-impl-id="demo-impl-2">
+                            <div class="implementation-header">
+                                <span class="status completed">Completed</span>
+                                <h3>Added proper error handling</h3>
+                            </div>
+                            <p>Implemented try-except blocks with specific exception handling and logging.</p>
+                            <div class="code-diff">
+                                <pre><code>@@ -78,5 +78,12 @@
+ def call_external_api(endpoint, data):
+-    response = requests.post(API_URL + endpoint, json=data)
+-    return response.json()
++    try:
++        response = requests.post(API_URL + endpoint, json=data, timeout=10)
++        response.raise_for_status()
++        return response.json()
++    except requests.exceptions.Timeout:
++        logger.error(f"API request to {endpoint} timed out")
++        raise APITimeoutError(f"Request to {endpoint} timed out")
++    except requests.exceptions.RequestException as e:
++        logger.error(f"API request failed: {str(e)}")
++        raise APIRequestError(f"Request failed: {str(e)}")</code></pre>
+                            </div>
+                            <div class="implementation-actions">
+                                <button class="btn btn-sm btn-primary">Create PR</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>AOMaaS</h2>
+                    <p>Autonomous Open-Source Maintainer as a Service</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-links-column">
+                        <h3>Product</h3>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/demo">Demo</a></li>
+                            <li><a href="/pricing">Pricing</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Resources</h3>
+                        <ul>
+                            <li><a href="/docs">Documentation</a></li>
+                            <li><a href="/api">API</a></li>
+                            <li><a href="/blog">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Company</h3>
+                        <ul>
+                            <li><a href="/about">About</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/privacy">Privacy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 AOMaaS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript functionality moved to /static/js/demo.js -->
+</body>
+</html>

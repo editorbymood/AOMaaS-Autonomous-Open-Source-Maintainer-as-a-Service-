@@ -1,10 +1,17 @@
 """API routes for AOMaaS."""
+from datetime import timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
 
-from aomass.models.api import (
+from .auth import (
+    Token, User, authenticate_user, create_access_token, get_current_active_user,
+    ACCESS_TOKEN_EXPIRE_MINUTES, users_db
+)
+from . import demo
+from ..models.api import (
     CreatePRRequest,
     GeneratePlanRequest,
     ImplementPlanRequest,
@@ -19,14 +26,40 @@ from aomass.models.api import (
     ReviewResponse,
     TaskResponse,
 )
-from aomass.services.indexer import IndexerService
-from aomass.services.miner import MinerService
-from aomass.services.planner import PlannerService
-from aomass.services.implementer import ImplementerService
-from aomass.services.pr_manager import PRManagerService
-from aomass.services.reviewer import ReviewerService
+from ..services.indexer import IndexerService
+from ..services.miner import MinerService
+from ..services.planner import PlannerService
+from ..services.implementer import ImplementerService
+from ..services.pr_manager import PRManagerService
+from ..services.reviewer import ReviewerService
 
 router = APIRouter()
+
+# Include demo router in the main router
+router.include_router(demo.router, tags=["demo"])
+
+# Authentication routes
+@router.post("/auth/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    """Get access token."""
+    user = authenticate_user(users_db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/auth/me", response_model=User)
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    """Get current user."""
+    return current_user
 
 # Service instances (will be injected via dependency injection)
 indexer_service = IndexerService()
@@ -42,10 +75,11 @@ async def index_repository(
     request: IndexRepositoryRequest, 
     background_tasks: BackgroundTasks
 ) -> IndexResponse:
-    """Index a GitHub repository."""
+    """Index a repository from any supported cloud provider."""
     try:
         task_id = await indexer_service.index_repository(
             url=str(request.url),
+            provider_type=request.provider_type,
             branch=request.branch,
             force_reindex=request.force_reindex
         )
@@ -53,7 +87,7 @@ async def index_repository(
         return IndexResponse(
             task_id=task_id,
             status="pending",
-            message="Repository indexing started"
+            message=f"Repository indexing started for {request.provider_type or 'detected provider'}"
         )
     except Exception as e:
         raise HTTPException(
@@ -141,20 +175,32 @@ async def implement_plan(
 async def create_pull_request(
     request: CreatePRRequest
 ) -> PRResponse:
-    """Create a GitHub pull request."""
+    """Create a pull request on any supported cloud provider."""
     try:
         pr = await pr_manager_service.create_pull_request(
             implementation_id=request.implementation_id,
             title=request.title,
             description=request.description,
-            draft=request.draft
+            draft=request.draft,
+            provider_type=request.provider_type
         )
+        
+        # Generate URL based on provider type
+        pr_url = None
+        if pr.provider_reference and pr.provider_reference.url:
+            pr_url = pr.provider_reference.url
         
         return PRResponse(
             pr_id=pr.id,
-            github_pr_number=pr.github_pr_number,
-            url=f"https://github.com/owner/repo/pull/{pr.github_pr_number}" if pr.github_pr_number else None,
+            provider_type=pr.provider_type,
+            provider_pr_number=pr.provider_pr_number,
+            url=pr_url,
             status=pr.status
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid request: {str(e)}"
         )
     except Exception as e:
         raise HTTPException(

@@ -1,9 +1,11 @@
 """Multi-agent code review service."""
 import asyncio
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from aomass.models.core import PullRequest, Review
+from ..config.settings import get_settings
+from ..models.core import PullRequest, Repository, Review
+from ..providers.factory import ProviderFactory
 
 
 class ReviewerService:
@@ -17,6 +19,8 @@ class ReviewerService:
             "testing-agent",
             "documentation-agent"
         ]
+        self.provider_factory = ProviderFactory()
+        self.settings = get_settings()
     
     async def review_pull_request(
         self,
@@ -55,21 +59,35 @@ class ReviewerService:
             score=average_score
         )
         
-        # TODO: Post review comments to GitHub PR
-        await self._post_github_review(pr, review)
+        # TODO: Post review comments to provider PR
+        await self._post_provider_review(pr, review)
         
         return review
     
     async def _get_pull_request(self, pull_request_id: UUID) -> PullRequest:
         """Get pull request by ID."""
-        # TODO: Implement database query
+        # TODO: Implement database query to get the actual pull request
         return PullRequest(
             id=pull_request_id,
             implementation_id=UUID("12345678-1234-5678-9012-123456789012"),
             title="Mock PR",
             description="Mock pull request",
             branch_name="aomass/mock-branch",
-            github_pr_number=1234
+            provider_type="github",
+            provider_id="owner/repo",
+            provider_pr_id="1234"
+        )
+        
+    async def _get_repository_for_pr(self, pull_request: PullRequest) -> Optional[Repository]:
+        """Get repository for a pull request."""
+        # TODO: Implement database query to get the repository associated with this PR
+        return Repository(
+            id=UUID("87654321-4321-8765-0123-987654321098"),
+            name="Mock Repository",
+            url=f"https://github.com/{pull_request.provider_id}",
+            provider_type=pull_request.provider_type,
+            provider_id=pull_request.provider_id,
+            default_branch="main"
         )
     
     async def _conduct_agent_review(
@@ -172,9 +190,24 @@ class ReviewerService:
         else:
             return "changes_requested"
     
-    async def _post_github_review(self, pr: PullRequest, review: Review):
-        """Post review comments to GitHub PR."""
-        # TODO: Implement GitHub API integration to post review comments
-        print(f"Posted review to GitHub PR #{pr.github_pr_number}")
+    async def _post_provider_review(self, pr: PullRequest, review: Review):
+        """Post review comments to provider PR."""
+        # Get the repository for this PR
+        repository = await self._get_repository_for_pr(pr)
+        if not repository:
+            print(f"Could not find repository for PR {pr.id}")
+            return
+            
+        # Get the appropriate provider
+        provider = self.provider_factory.get_provider(repository.provider_type)
+        if not provider:
+            print(f"Unsupported provider type: {repository.provider_type}")
+            return
+            
+        # TODO: Implement provider API integration to post review comments
+        # This will use the provider's API to post the review
+        await provider.post_review(repository.provider_id, pr.provider_pr_id, review)
+        
+        print(f"Posted review to {pr.provider_type.capitalize()} PR #{pr.provider_pr_id}")
         print(f"Status: {review.status}, Score: {review.score:.1f}/10")
         print(f"Comments: {len(review.comments)}")

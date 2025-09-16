@@ -6,7 +6,7 @@ from pathlib import Path
 import structlog
 from rich.logging import RichHandler
 
-from aomass.config.settings import settings
+from ..config.settings import settings
 
 
 def setup_logging() -> None:

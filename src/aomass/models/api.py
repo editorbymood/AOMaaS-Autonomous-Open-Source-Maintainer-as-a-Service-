@@ -5,13 +5,15 @@ from uuid import UUID
 from pydantic import BaseModel, Field, HttpUrl
 
 from .core import Language, OpportunityType, TaskStatus
+from .providers import ProviderType
 
 
 # Request Models
 class IndexRepositoryRequest(BaseModel):
     """Request to index a repository."""
     url: HttpUrl
-    branch: str = "main"
+    provider_type: Optional[str] = None
+    branch: Optional[str] = None
     force_reindex: bool = False
 
 
@@ -41,6 +43,7 @@ class CreatePRRequest(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     draft: bool = True
+    provider_type: Optional[ProviderType] = None  # If None, uses default provider
 
 
 class ReviewPRRequest(BaseModel):
@@ -88,7 +91,8 @@ class ImplementationResponse(TaskResponse):
 class PRResponse(BaseModel):
     """Pull request response."""
     pr_id: UUID
-    github_pr_number: Optional[int] = None
+    provider_type: ProviderType
+    provider_pr_number: Optional[str] = None
     url: Optional[str] = None
     status: str
 
@@ -96,6 +100,9 @@ class PRResponse(BaseModel):
 class ReviewResponse(BaseModel):
     """Review response."""
     review_id: UUID
+    provider_type: str
+    provider_id: str
+    provider_review_id: Optional[str] = None
     status: str
     score: float
     comments_count: int

@@ -21,6 +21,8 @@ services:
     volumes:
       - ./configs:/app/configs
       - ./logs:/app/logs
+      - ./static:/app/static
+      - ./templates:/app/templates
     restart: unless-stopped
 
   # Worker Service

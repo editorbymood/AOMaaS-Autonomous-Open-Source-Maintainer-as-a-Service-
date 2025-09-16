@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50">
+  <defs>
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <path d="M20 10 L40 10 L40 40 L20 40 Z" stroke="url(#logo-gradient)" stroke-width="3" />
+    <path d="M25 15 L35 15 L35 35 L25 35 Z" stroke="url(#logo-gradient)" stroke-width="2" />
+    <circle cx="30" cy="25" r="5" fill="url(#logo-gradient)" />
+    <path d="M15 25 L20 25" stroke="url(#logo-gradient)" stroke-width="2" />
+    <path d="M40 25 L45 25" stroke="url(#logo-gradient)" stroke-width="2" />
+    <path d="M30 5 L30 10" stroke="url(#logo-gradient)" stroke-width="2" />
+    <path d="M30 40 L30 45" stroke="url(#logo-gradient)" stroke-width="2" />
+    
+    <!-- Text -->
+    <text x="55" y="32" font-family="'Inter', sans-serif" font-size="24" font-weight="700" fill="#1f2937">
+      AOMaaS
+    </text>
+  </g>
+</svg>

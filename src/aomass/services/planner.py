@@ -2,7 +2,7 @@
 from typing import Any, Dict
 from uuid import UUID
 
-from aomass.models.core import Opportunity, OpportunityType, Plan
+from ..models.core import Opportunity, OpportunityType, Plan
 
 
 class PlannerService:
